@@ -5,14 +5,26 @@
 (function($){
 
     // Map the plugin name as a function in jQuery
-    $.fn.tweet = function() {
+    // Pass in the options parameter for overriding defaults
+    $.fn.tweet = function(options) {
+
+        // Set the default plugin values
+        var defaults = {
+            username: 'the base username',
+            count: 5
+        };
+
+        // Use the jQuery method extend to merge
+        // the defaults and options arrays
+        options = $.extend({}, defaults, options);
 
         // Allow chaining by returning the this keyword
         return this.each(function() {
 
-                     // Output a console message to show the plugin
-                     // is working
-                     console.log('We have called the tweet plugin');
+            // Output a console message to show the plugin
+            // is working
+            console.log(options);
+
         });
 
     };
