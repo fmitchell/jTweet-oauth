@@ -101,20 +101,14 @@
     function formatLinks (text) {
         var tweet = '';
 
-        var linkRegex = /(((https?:\/\/)|(www1?))\S+)/;
-        var hashRegex = /(\#{1}(\w+))/;
-        var atRegex = /(\@{1}(\w+))/;
+        var linkRegex = /(((https?:\/\/)|(www1?))\S+)/gi;
+        var hashRegex = /(\#{1}(\w+))/gi;
+        var atRegex = /(\@{1}(\w+))/gi;
 
-        
-
-        tweet = text.replace(linkRegex, '$1');
-
-        console.log(tweet);
-
-        /*tweet = text
-            .replace(linkRegex, '$1')
-            .replace(hashRegex, '$1')
-            .replace(atRegex, '$1');*/
+        tweet = text
+            .replace(linkRegex, '<a href="$1">$1</a>')
+            .replace(hashRegex, '<a href="https://www.twitter.com/$1">$1</a>')
+            .replace(atRegex,   '<a href="https://www.twitter.com/$1">$1</a>');
 
         return tweet;
     }
