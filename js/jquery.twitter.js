@@ -10,7 +10,7 @@
 
         // Set the default plugin values
         var defaults = {
-            username: 'the base username',
+            screen_name: 'the base username',
             count: 5
         };
 
@@ -21,12 +21,102 @@
         // Allow chaining by returning the this keyword
         return this.each(function() {
 
-            // Output a console message to show the plugin
-            // is working
-            console.log(options);
+            // Cache the jquery keyword
+            var $this = $(this);
+            var output = '';
+
+            // Use OAuth to authenticate
+            // Grab User timeline
+            $.ajax({
+                dataType: "json",
+                url: "php/oAuth.php",
+                data: options
+            }).done(function(data) {
+
+                // Set the current system time
+                var now = new Date();
+
+                // Loop through results
+                $.each(data, function(key, value) {
+
+                    // Format the create_at time into a js date obj
+                    created_at = new Date(value['created_at']);
+
+                    // Calculate the time posted
+                    timePosted = getTimePosted(now, created_at);
+
+                    tweet = formatLinks(value['text'].toString());
+
+                    output += '<div class="twitter-tweet">' + tweet + '</div><div class="twitter-posted-at">' + timePosted + '</div>';
+
+                });
+
+                $this.html(output);
+
+            });
 
         });
 
     };
+
+    function getTimePosted(startDate, endDate) {
+
+        // Init var
+        var timePosted, diff, seconds, minutes, hours;
+
+        // What is the difference in timing between tweets
+        diff = startDate.getTime() - endDate.getTime();
+
+        // Calculate the seconds for the difference
+        seconds = diff / 1000;
+        minutes = seconds / 60;
+        hours = minutes / 60;
+
+        // If seconds are less than 60 then it was just posted
+        if (seconds < 60) {
+            timePosted = 'just now';
+
+        // If less than 60 minutes then it is within the hour
+        // display minutes
+        } else if (minutes < 60) {
+            minutes = Math.floor(minutes);
+            timePosted = (minutes > 1) ? minutes + ' minutes ago' : 'about a minute ago';
+
+        // If Less than 24 hours it is the same day
+        // display hours
+        } else if (hours < 24) {
+            hours = Math.floor(hours);
+            timePosted = (hours > 1) ? hours + ' hours ago' : 'about an hour ago';
+
+        // If greater than 24 then it is a couple days ago
+        // display days
+        } else if (hours >= 24) {
+            days = Math.floor(hours / 24);
+            timePosted = (days > 1) ? days + ' days ago' : 'about a day ago';
+        }
+
+        return timePosted;
+    }
+
+    function formatLinks (text) {
+        var tweet = '';
+
+        var linkRegex = /(((https?:\/\/)|(www1?))\S+)/;
+        var hashRegex = /(\#{1}(\w+))/;
+        var atRegex = /(\@{1}(\w+))/;
+
+        
+
+        tweet = text.replace(linkRegex, '$1');
+
+        console.log(tweet);
+
+        /*tweet = text
+            .replace(linkRegex, '$1')
+            .replace(hashRegex, '$1')
+            .replace(atRegex, '$1');*/
+
+        return tweet;
+    }
 
 })(jQuery);
