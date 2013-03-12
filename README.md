@@ -1,4 +1,4 @@
-# A Jquery Twitter plugin #
+# jQuery Twitter Plugin with OAuth support #
 
 ## Usage ##
 For this plugin to work with Twitter's 1.1 api you first need to setup OAuth.  Luckily there is an excellent plugin called twitteroauth which will take care of this for us.
