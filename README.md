@@ -9,7 +9,7 @@ Plugin uses twitteroauth by abraham https://github.com/abraham/twitteroauth to a
 1. First you will need to create a developer account at https://dev.twitter.com/  
 2. Next you need to create a new application under My Applications  
 3. Make sure to set the url to the website you intend to use this plugin on  
-*Note* If you want to use this locally then set the url to something like http://localhost/myTestPage.php  
+*Note:* If you want to use this locally then set the url to something like http://localhost/myTestPage.php  
 4. Finally go to the OAuth tool tab for the application and copy / paste the four keys at the top into the file php/oAuth.php.
 
 You have now succesfully setup OAuth with twitter.
@@ -20,5 +20,5 @@ You have now succesfully setup OAuth with twitter.
 * exclude_replies   - Whether or not to exclude replies
 * include_rts       - Whether or not to include retweets
 
-*Note: * For exlude_replies and include_rts the number of returned tweets are filtered after the count option is executed.  For example if you have a count of 20, have set exclude_replies to true, and have 3 replies then there will be 17 tweets displayed.
+*Note:* For exlude_replies and include_rts the number of returned tweets are filtered after the count option is executed.  For example if you have a count of 20, have set exclude_replies to true, and have 3 replies then there will be 17 tweets displayed.
 
