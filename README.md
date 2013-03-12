@@ -15,5 +15,10 @@ Plugin uses twitteroauth by abraham https://github.com/abraham/twitteroauth to a
 You have now succesfully setup OAuth with twitter.
 
 ## Plugin Options ##
-* count         - The number of tweets to return  
-* screen_name   - The twitter user to return tweets for
+* count             - The number of tweets to return  
+* screen_name       - The twitter user to return tweets for
+* exclude_replies   - Whether or not to exclude replies
+* include_rts       - Whether or not to include retweets
+
+*Note: * For exlude_replies and include_rts the number of returned tweets are filtered after the count option is executed.  For example if you have a count of 20, have set exclude_replies to true, and have 3 replies then there will be 17 tweets displayed.
+

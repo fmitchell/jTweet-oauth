@@ -11,7 +11,9 @@
         // Set the default plugin values
         var defaults = {
             screen_name: 'the base username',
-            count: 5
+            count: 5,
+            exclude_replies: false,
+            include_rts: true
         };
 
         // Use the jQuery method extend to merge
@@ -45,12 +47,15 @@
                     // Calculate the time posted
                     timePosted = getTimePosted(now, created_at);
 
+                    // Get the tweets with links formatted
                     tweet = formatLinks(value['text'].toString());
 
+                    // Output the html
                     output += '<div class="twitter-tweet">' + tweet + '</div><div class="twitter-posted-at">' + timePosted + '</div>';
 
                 });
 
+                // Set the current element to display the output html
                 $this.html(output);
 
             });
