@@ -13,7 +13,8 @@
             screen_name: 'the base username',
             count: 5,
             exclude_replies: false,
-            include_rts: true
+            include_rts: true,
+            refresh: 1
         };
 
         // Use the jQuery method extend to merge
@@ -26,6 +27,30 @@
             // Cache the jquery keyword
             var $this = $(this);
             var output = '';
+            var currentTime = new Date();
+
+            // init the localstorage variable
+            var cache      = (localStorage['tweets-text'] ? localStorage['tweets-text'] : false);
+            var cachedTime = (localStorage['tweets-cached-time'] ? localStorage['tweets-cached-time'] : false);
+
+            // Calculate the time since last cache
+            minutesSinceLastCache = ((currentTime.getTime() - cachedTime) / 1000) / 60;
+
+            // Check cached time vs user set option from plugin
+            // If greater than then lets reset the localStorage
+            if (minutesSinceLastCache > options.refresh) {
+                localStorage.clear();
+                console.warn('LocalStorage has been cleared');
+            }
+
+            // If html5 localstorage is available and
+            // the cache variable exists
+            if (Modernizr.localstorage && localStorage['tweets-text'] && localStorage['tweets-cached-time']) {
+
+                // Output the html that has been stored
+                // and enjoy how fast this runs :-)
+                return $this.html(cache);
+            }
 
             // Use OAuth to authenticate
             // Grab User timeline
@@ -33,7 +58,7 @@
                 dataType: "json",
                 url: "php/oAuth.php",
                 data: options
-            }).done(function(data) {
+            }).done(function (data) {
 
                 // Set the current system time
                 var now = new Date();
@@ -51,13 +76,28 @@
                     tweet = formatLinks(value['text'].toString());
 
                     // Output the html
-                    output += '<div class="twitter-tweet">' + tweet + '</div><div class="twitter-posted-at">' + timePosted + '</div>';
+                    output += '<div class="twitter-single-tweet"><div class="twitter-tweet">' + tweet + '</div><div class="twitter-posted-at">' + timePosted + '</div></div>';
 
                 });
+
+                // Cache the output into html5 localStorage
+                if (Modernizr.localstorage) {
+
+                    // Grab the localtime in ms for the variable
+                    var cachedTime = new Date().getTime();
+
+                    // Set the appended output html string
+                    // into the localStorage
+                    localStorage['tweets-text']        = output;
+                    localStorage['tweets-cached-time'] = cachedTime;
+                }
 
                 // Set the current element to display the output html
                 $this.html(output);
 
+            }).fail(function (e) {
+
+                console.error('There was an error with OAuth or the Twitter service is down');
             });
 
         });
