@@ -1,10 +1,19 @@
 # jQuery Twitter Plugin with OAuth support #
 
+## TODO ##
+1. Cacheing, look into html5 local storage.  Will need modernizr for this
+2. Update html and provide base css style
+3. Default php variables
+4. Split twitter app keys into config.php file, include config.php into oAuth.php
+5. Remove extraneaous files from twitteroauth
+
 ## Usage ##
 For this plugin to work with Twitter's 1.1 api you first need to setup OAuth.  Luckily there is an excellent plugin called twitteroauth which will take care of this for us.
 
 ### OAuth Setup ###
-Plugin uses twitteroauth by abraham https://github.com/abraham/twitteroauth to authenticate against twitter's api.
+Plugin uses third-party php library twitteroauth   
+Developed by Abraham Williams | abraham@abrah.am | http://abrah.am | @abraham  
+https://github.com/abraham/twitteroauth to authenticate against twitter's api.
 
 1. First you will need to create a developer account at https://dev.twitter.com/  
 2. Next you need to create a new application under My Applications  
