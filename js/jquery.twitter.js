@@ -56,7 +56,7 @@
             // Grab User timeline
             $.ajax({
                 dataType: "json",
-                url: "php/oAuth.php",
+                url: "php/requestOAuth.php",
                 data: options
             }).done(function (data) {
 
