@@ -1,4 +1,3 @@
 
 # Remove this file as it contains private keys
-#php/oAuth.php
-#!php/twitterOauth/twitteroauth/OAuth.php
+!php/config.php
