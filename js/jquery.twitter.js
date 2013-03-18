@@ -28,28 +28,36 @@
             var $this = $(this);
             var output = '';
             var currentTime = new Date();
+            var retrieveLocalStorage = null;
+            var timeSinceCached = null;
+            var now = null;
+            var cachedAt = null;
 
-            // init the localstorage variable
-            var cache      = (localStorage['tweets-text'] ? localStorage['tweets-text'] : false);
-            var cachedTime = (localStorage['tweets-cached-time'] ? localStorage['tweets-cached-time'] : false);
+            // If localstorage is available
+            if (
+                Modernizr.localstorage
+                && localStorage['tweets']
+                && JSON.parse(localStorage['tweets'])) {
 
-            // Calculate the time since last cache
-            minutesSinceLastCache = ((currentTime.getTime() - cachedTime) / 1000) / 60;
+                // Grab the tweets from localStorage
+                retrieveLocalStorage = JSON.parse(localStorage['tweets']);
 
-            // Check cached time vs user set option from plugin
-            // If greater than then lets reset the localStorage
-            if (minutesSinceLastCache > options.refresh) {
-                localStorage.clear();
-                console.warn('LocalStorage has been cleared');
-            }
+                // Calculate the time in minutes since last cached
+                timeSinceCached = ((currentTime.getTime() - retrieveLocalStorage['cachedAt']) / 1000) / 60;
 
-            // If html5 localstorage is available and
-            // the cache variable exists
-            if (Modernizr.localstorage && localStorage['tweets-text'] && localStorage['tweets-cached-time']) {
+                // Check cached time vs user set option from plugin
+                // If greater than then lets reset the localStorage
+                if (timeSinceCached > options.refresh) {
 
-                // Output the html that has been stored
-                // and enjoy how fast this runs :-)
-                return $this.html(cache);
+                    localStorage.clear();
+                    console.warn('LocalStorage has been cleared');
+
+                } else {
+
+                    // Output the cached html for tweets
+                    return $this.html(retrieveLocalStorage['text']);
+
+                }
             }
 
             // Use OAuth to authenticate
@@ -58,10 +66,11 @@
                 dataType: "json",
                 url: "php/requestOAuth.php",
                 data: options
+
             }).done(function (data) {
 
                 // Set the current system time
-                var now = new Date();
+                now = new Date();
 
                 // Loop through results
                 $.each(data, function(key, value) {
@@ -73,10 +82,10 @@
                     timePosted = getTimePosted(now, created_at);
 
                     // Get the tweets with links formatted
-                    tweet = formatLinks(value['text'].toString());
+                    tweetText = formatLinks(value['text'].toString());
 
                     // Output the html
-                    output += '<div class="twitter-single-tweet"><div class="twitter-tweet">' + tweet + '</div><div class="twitter-posted-at">' + timePosted + '</div></div>';
+                    output += '<div class="twitter-single-tweet"><div class="twitter-tweet">' + tweetText + '</div><div class="twitter-posted-at">' + timePosted + '</div></div>';
 
                 });
 
@@ -84,12 +93,17 @@
                 if (Modernizr.localstorage) {
 
                     // Grab the localtime in ms for the variable
-                    var cachedTime = new Date().getTime();
+                    cachedAt = new Date().getTime();
 
-                    // Set the appended output html string
-                    // into the localStorage
-                    localStorage['tweets-text']        = output;
-                    localStorage['tweets-cached-time'] = cachedTime;
+                    // Format the object prior to stringify
+                    tweets = {
+                        'text': output,
+                        'cachedAt': cachedAt
+                    };
+
+                    // Stringify the array so we only need to look at 
+                    // one localstorage value
+                    localStorage['tweets'] = JSON.stringify(tweets);
                 }
 
                 // Set the current element to display the output html
@@ -97,7 +111,7 @@
 
             }).fail(function (e) {
 
-                console.error('There was an error with OAuth or the Twitter service is down');
+                console.error('There was an error with OAuth, the Twitter service is down, or your php/requestOAuth.php is missing/invalid');
             });
 
         });

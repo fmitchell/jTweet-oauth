@@ -1,7 +1,7 @@
 <?php
 
     // require the Twitter oauth class
-    require_once('twitteroauth/twitteroauth/twitteroauth.php'); 
+    require_once('twitterOAuth/twitteroauth.php'); 
     require_once('config.php');
 
     // Sanitize user variables
