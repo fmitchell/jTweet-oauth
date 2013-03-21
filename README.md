@@ -37,6 +37,9 @@ to true, and have 3 replies then there will be 17 tweets displayed.
 
 You have now succesfully setup OAuth with twitter.
 
+## Twitter Error Codes ##
+https://dev.twitter.com/docs/error-codes-responses
+
 ## Third-Party Library ##
 Plugin uses third-party php library twitteroauth   
 Developed by Abraham Williams | abraham@abrah.am | http://abrah.am | @abraham  
