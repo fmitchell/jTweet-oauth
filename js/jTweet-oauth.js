@@ -1,3 +1,7 @@
+
+// Prevent console.log errors
+(function(){for(var a,e=function(){},b="assert clear count debug dir dirxml error exception group groupCollapsed groupEnd info log markTimeline profile profileEnd table time timeEnd timeStamp trace warn".split(" "),c=b.length,d=window.console=window.console||{};c--;)a=b[c],d[a]||(d[a]=e)})();
+
 // Wrap the plugin in the jquery dollar sign
 // This will prevent overriding other methods with
 // the same name as the plugin
@@ -14,7 +18,7 @@
             count: 5,
             exclude_replies: false,
             include_rts: true,
-            refresh: 1
+            refresh: 5
         };
 
         // Use the jQuery method extend to merge
@@ -75,8 +79,22 @@
                 // Loop through results
                 $.each(data, function(key, value) {
 
-                    // Format the create_at time into a js date obj
-                    created_at = new Date(value['created_at']);
+                    // Was there a Twitter error code?
+                    if (typeof value[0] != 'undefined' && value[0].hasOwnProperty('code')) {
+
+                        // Log the error to the console
+                        console.error('Twitter Error Code (' + value[0].code + '): ' + value[0].message);
+
+                        // Debug: store error in localstorage (optional)
+                        localStorage['tweets-error'] = 'Twitter Error Code (' + value[0].code + '): ' + value[0].message;
+                        return $this.html('<p>There are no tweets available</p>');
+                    }
+
+                    userImage = '';
+
+                    // IE balks at trying to format a date string use this regex method
+                    // from stackoverflow
+                    created_at = parseDate(value['created_at']);
 
                     // Calculate the time posted
                     timePosted = getTimePosted(now, created_at);
@@ -84,8 +102,16 @@
                     // Get the tweets with links formatted
                     tweetText = formatLinks(value['text'].toString());
 
+                    // Check for empty string
+                    // May need better conditional check here...
+                    if (value.user.profile_image_url !== '') {
+
+                        // Create the user profile image
+                        userImage = '<img src="' + value.user.profile_image_url + '" alt="' + value.user.screen_name + ': ' + value.user.description + '/>';
+                    }
+
                     // Output the html
-                    output += '<div class="twitter-single-tweet"><div class="twitter-tweet">' + tweetText + '</div><div class="twitter-posted-at">' + timePosted + '</div></div>';
+                    output += '<div class="twitter-single-tweet">' + userImage + '<div class="twitter-tweet">' + tweetText + '</div><div class="twitter-posted-at">' + timePosted + '</div></div>';
 
                 });
 
@@ -117,6 +143,11 @@
         });
 
     };
+
+    function parseDate(str) {
+        var v=str.split(' ');
+        return new Date(Date.parse(v[1]+" "+v[2]+", "+v[5]+" "+v[3]+" UTC"));
+    }
 
     function getTimePosted(startDate, endDate) {
 
