@@ -1,5 +1,5 @@
 // Wrap the plugin in the jquery dollar sign
-// This will prevent overriding other methods with 
+// This will prevent overriding other methods with
 // the same name as the plugin
 // Additionally we can use $ to reference jquery
 (function($){
@@ -64,7 +64,7 @@
             // Grab User timeline
             $.ajax({
                 dataType: "json",
-                url: "php/requestOAuth.php",
+                url: "/php/requestOAuth.php",
                 data: options
 
             }).done(function (data) {
@@ -101,7 +101,7 @@
                         'cachedAt': cachedAt
                     };
 
-                    // Stringify the array so we only need to look at 
+                    // Stringify the array so we only need to look at
                     // one localstorage value
                     localStorage['tweets'] = JSON.stringify(tweets);
                 }
