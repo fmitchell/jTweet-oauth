@@ -8,7 +8,7 @@
  * @copyright Copyright (c) 2013, Joshua Frankel
  * @link https://github.com/joshmfrankel/jTweet-oauth
  * @see  Twitteroauth https://github.com/abraham/twitteroauth for authentication details
- * @version 0.7
+ * @version 0.9
  */
 
 // Prevent console.log errors
@@ -26,15 +26,17 @@
 
         // Set the default plugin values
         var defaults = {
-            screen_name: 'the base username',
             count: 5,
-            exclude_replies: false,
-            include_rts: true,
-            refresh: 5,
-            show_profile: true,
             css_prefix_class: 'jTweet',
             debug: false,
-            no_tweets_msg: 'There are no tweets available'
+            exclude_replies: false,
+            include_rts: true,
+            no_tweets_msg: 'There are no tweets available',
+            refresh: 5,
+            screen_name: 'the base username',
+            show_profile_image: true,
+            show_single_profile_image: true,
+            show_screen_name_link: true
         };
 
         // Use the jQuery method extend to merge
@@ -48,12 +50,13 @@
             var $this = $(this);
 
             // init vars
-            var output = '';
+            var cachedAt = null;
             var currentTime = new Date();
+            var output = '';
+            var now = null;
             var retrieveLocalStorage = null;
             var timeSinceCached = null;
-            var now = null;
-            var cachedAt = null;
+            var singleProfileImage = '';
 
             // If localstorage is available
             if (
@@ -129,17 +132,34 @@
                     // Get the tweets with links formatted
                     tweetText = formatLinks(value['text'].toString());
 
-                    // Make sure show_profile is true and Check for empty string
-                    if (options.show_profile && value.user.profile_image_url !== '') {
+                    // Make sure show_profile_image is true and Check for empty string
+                    if (options.show_profile_image && value.user.profile_image_url !== '' && singleProfileImage === '') {
 
                         // Create the user profile image
-                        userImage = '<img src="' + value.user.profile_image_url + '" alt="' + value.user.screen_name + ': ' + value.user.description + '/>';
+                        userImage = '<img src="' + value.user.profile_image_url + '" alt="' + value.user.screen_name + ': ' + value.user.description + '" class="' + options.css_prefix_class + '-profile-image"/>';
+
+                        if (options.show_single_profile_image) {
+                            singleProfileImage = userImage;
+                            userImage = '';
+                        }
                     }
 
                     // Output the html
                     output += '<div class="' + options.css_prefix_class + '-single-tweet">' + userImage + '<div class="' + options.css_prefix_class + '-tweet-text">' + tweetText + '<div class="' + options.css_prefix_class + '-posted-at">' + timePosted + '</div></div></div>';
 
                 });
+
+
+
+                // Are we displaying a main twitter handle link
+                if (options.show_screen_name_link) {
+                    output = '<a href="https://www.twitter.com/' + options.screen_name + '" class="' + options.css_prefix_class + '-screen-name-link">@' + options.screen_name + '</a>' + output;
+                }
+
+                                // For single profile images
+                if (options.show_profile_image && singleProfileImage !== '') {
+                    output = singleProfileImage + output;
+                }
 
                 // Cache the output into html5 localStorage
                 if (Modernizr.localstorage) {
