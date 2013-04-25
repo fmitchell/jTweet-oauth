@@ -1,7 +1,7 @@
 <?php
 
     // require the Twitter oauth class
-    require_once('twitterOAuth/twitteroauth.php'); 
+    require_once('twitterOAuth/twitteroauth.php');
     require_once('config.php');
 
     // Sanitize user variables
@@ -14,10 +14,10 @@
     $connection = new TwitterOAuth($consumerKey, $consumerSecret, $accessToken, $accessTokenSecret);
 
     // Grab the tweets
-    $tweets = 
-        $connection->get("https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=" 
-                . $screen_name 
-                . "&count=" 
+    $tweets =
+        $connection->get("https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name="
+                . $screen_name
+                . "&count="
                 . $count
                 . "&exclude_replies="
                 . $exclude_replies

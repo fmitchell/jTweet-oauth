@@ -1,3 +1,15 @@
+/**
+ * jTweet-oauth
+ *
+ * This plugin build arround the twitteroauth library to create
+ * an easy to use way of grabbing tweets from Twitter's 1.1 api
+ *
+ * @author Joshua Frankel <joshmfrankel@gmail.com>
+ * @copyright Copyright (c) 2013, Joshua Frankel
+ * @link https://github.com/joshmfrankel/jTweet-oauth
+ * @see  Twitteroauth https://github.com/abraham/twitteroauth for authentication details
+ * @version 0.7
+ */
 
 // Prevent console.log errors
 (function(){for(var a,e=function(){},b="assert clear count debug dir dirxml error exception group groupCollapsed groupEnd info log markTimeline profile profileEnd table time timeEnd timeStamp trace warn".split(" "),c=b.length,d=window.console=window.console||{};c--;)a=b[c],d[a]||(d[a]=e)})();
@@ -10,7 +22,7 @@
 
     // Map the plugin name as a function in jQuery
     // Pass in the options parameter for overriding defaults
-    $.fn.tweet = function(options) {
+    $.fn.jTweet = function(options) {
 
         // Set the default plugin values
         var defaults = {
@@ -18,7 +30,11 @@
             count: 5,
             exclude_replies: false,
             include_rts: true,
-            refresh: 5
+            refresh: 5,
+            show_profile: true,
+            css_prefix_class: 'jTweet',
+            debug: false,
+            no_tweets_msg: 'There are no tweets available'
         };
 
         // Use the jQuery method extend to merge
@@ -30,6 +46,8 @@
 
             // Cache the jquery keyword
             var $this = $(this);
+
+            // init vars
             var output = '';
             var currentTime = new Date();
             var retrieveLocalStorage = null;
@@ -40,11 +58,11 @@
             // If localstorage is available
             if (
                 Modernizr.localstorage
-                && localStorage['tweets']
-                && JSON.parse(localStorage['tweets'])) {
+                && localStorage['jTweets-oauth']
+                && JSON.parse(localStorage['jTweets-oauth'])) {
 
                 // Grab the tweets from localStorage
-                retrieveLocalStorage = JSON.parse(localStorage['tweets']);
+                retrieveLocalStorage = JSON.parse(localStorage['jTweets-oauth']);
 
                 // Calculate the time in minutes since last cached
                 timeSinceCached = ((currentTime.getTime() - retrieveLocalStorage['cachedAt']) / 1000) / 60;
@@ -68,7 +86,7 @@
             // Grab User timeline
             $.ajax({
                 dataType: "json",
-                url: "/php/requestOAuth.php",
+                url: "./php/requestOAuth.php",
                 data: options
 
             }).done(function (data) {
@@ -76,20 +94,29 @@
                 // Set the current system time
                 now = new Date();
 
+                // Error Check
+                if (typeof data.errors != 'undefined' && data.errors[0].hasOwnProperty('code')) {
+
+                    // Make sure we are in debug mode before outputting the direct
+                    // api errors
+                    if (options.debug) {
+
+                        // Log the error to the console
+                        console.error('Twitter Error Code (' + data.errors[0].code + '): ' + data.errors[0].message);
+
+                        // Debug: store error in localstorage (optional)
+                        localStorage['jTweets-oauth-error-log'] = 'Twitter Error Code (' + data.errors[0].code + '): ' + data.errors[0].message;
+                    }
+
+                    // Early return for errors
+                    return $this.html(options.no_tweets_msg);
+                }
+
+
                 // Loop through results
                 $.each(data, function(key, value) {
 
-                    // Was there a Twitter error code?
-                    if (typeof value[0] != 'undefined' && value[0].hasOwnProperty('code')) {
-
-                        // Log the error to the console
-                        console.error('Twitter Error Code (' + value[0].code + '): ' + value[0].message);
-
-                        // Debug: store error in localstorage (optional)
-                        localStorage['tweets-error'] = 'Twitter Error Code (' + value[0].code + '): ' + value[0].message;
-                        return $this.html('<p>There are no tweets available</p>');
-                    }
-
+                    // init userImage
                     userImage = '';
 
                     // IE balks at trying to format a date string use this regex method
@@ -102,16 +129,15 @@
                     // Get the tweets with links formatted
                     tweetText = formatLinks(value['text'].toString());
 
-                    // Check for empty string
-                    // May need better conditional check here...
-                    if (value.user.profile_image_url !== '') {
+                    // Make sure show_profile is true and Check for empty string
+                    if (options.show_profile && value.user.profile_image_url !== '') {
 
                         // Create the user profile image
                         userImage = '<img src="' + value.user.profile_image_url + '" alt="' + value.user.screen_name + ': ' + value.user.description + '/>';
                     }
 
                     // Output the html
-                    output += '<div class="twitter-single-tweet">' + userImage + '<div class="twitter-tweet">' + tweetText + '</div><div class="twitter-posted-at">' + timePosted + '</div></div>';
+                    output += '<div class="' + options.css_prefix_class + '-single-tweet">' + userImage + '<div class="' + options.css_prefix_class + '-tweet-text">' + tweetText + '<div class="' + options.css_prefix_class + '-posted-at">' + timePosted + '</div></div></div>';
 
                 });
 
@@ -129,7 +155,7 @@
 
                     // Stringify the array so we only need to look at
                     // one localstorage value
-                    localStorage['tweets'] = JSON.stringify(tweets);
+                    localStorage['jTweets-oauth'] = JSON.stringify(tweets);
                 }
 
                 // Set the current element to display the output html
@@ -137,24 +163,36 @@
 
             }).fail(function (e) {
 
-                console.error('There was an error with OAuth, the Twitter service is down, or your php/requestOAuth.php is missing/invalid');
+                // We haz fail
+                console.error('There was an error with OAuth, the Twitter service is down, or php/requestOAuth.php is missing/invalid');
+
+                // If debug mode then dump the event varaible
+                if (options.debug) {
+                    console.error(e);
+                }
+
             });
 
         });
 
     };
 
-    function parseDate(str) {
-        var v=str.split(' ');
-        return new Date(Date.parse(v[1]+" "+v[2]+", "+v[5]+" "+v[3]+" UTC"));
-    }
 
+    /**
+     * Get Time Posted
+     *
+     * Determine the elapsed time for the posts
+     *
+     * @param  {Date} startDate The Start date
+     * @param  {Date} endDate   The End date
+     * @return {string}         The formatted string for time posted
+     */
     function getTimePosted(startDate, endDate) {
 
         // Init var
         var timePosted, diff, seconds, minutes, hours;
 
-        // What is the difference in timing between tweets
+        // What is the difference in timing between jTweets-oauth
         diff = startDate.getTime() - endDate.getTime();
 
         // Calculate the seconds for the difference
@@ -188,19 +226,53 @@
         return timePosted;
     }
 
+    /**
+     * Format Links
+     *
+     * This method will convert hyperlinks, hash tags, an replies
+     * into valid links
+     *
+     * @author Josh Frankel <joshmfrankel@gmail.com>
+     * @param  {string} text The Tweet text
+     * @return {string}      The formatted text
+     */
     function formatLinks (text) {
+
+        // init the output variable
         var tweet = '';
 
+        // Link regex for http/https/www
         var linkRegex = /(((https?:\/\/)|(www1?))\S+)/gi;
-        var hashRegex = /(\#{1}(\w+))/gi;
-        var atRegex = /(\@{1}(\w+))/gi;
 
+        // Hash tag regex with replace
+        var hashRegex = /(\#{1}(\w+))/gi;
+
+        // @ tag regex for username replace, email address are not allowed
+        var atRegex = /(\s\@{1}(\w+))/gi;
+
+        // The Regex replace
         tweet = text
             .replace(linkRegex, '<a href="$1">$1</a>')
             .replace(hashRegex, '<a href="https://www.twitter.com/$1">$1</a>')
             .replace(atRegex,   '<a href="https://www.twitter.com/$1">$1</a>');
 
+        // return the formatted tweet
         return tweet;
+    }
+
+    /**
+     * Parse Date
+     *
+     * Takes a date in string format and parses
+     * it into a proper dateTime
+     *
+     * @author  Stackoverflow
+     * @param  {string} str The datetime string to convert
+     * @return {Date}       A Properly formatted datetime
+     */
+    function parseDate(str) {
+        var v=str.split(' ');
+        return new Date(Date.parse(v[1]+" "+v[2]+", "+v[5]+" "+v[3]+" UTC"));
     }
 
 })(jQuery);

@@ -1,12 +1,17 @@
 # jQuery Twitter Plugin with OAuth support #
+**Version:** 0.5  
 This plugin build arround the twitteroauth library to create 
 an easy to use way of grabbing tweets from Twitter's 1.1 api
 
+## TODO ##
+1. Basic CSS
+2. PHP Mem Cache
+
 ## Implementation ##
-1. Include jquery, modernizr, and the plugin javascript
-2. Include php folder
-3. Setup OAuth (see below steps for OAuth Setup)
-4. Execute the plugin
+1. Include jquery, modernizr, and the plugin javascript as scripts
+2. Setup OAuth (see below steps for OAuth Setup)
+3. Fill out the application keys in config.php
+4. Call the jquery method
 5. Enjoy :-)
 
 Sample Call  
@@ -17,11 +22,11 @@ Sample Call
         });
 
 ### Plugin Options ###
-* count             - The number of tweets to return  
-* screen_name       - The twitter user to return tweets for
-* exclude_replies   - Whether or not to exclude replies
-* include_rts       - Whether or not to include retweets
-* refresh           - The refresh interval in minutes
+* **count**             - The number of tweets to return  
+* **screen_name**       - The twitter user to return tweets for
+* **exclude_replies**   - Whether or not to exclude replies
+* **include_rts**       - Whether or not to include retweets
+* **refresh**           - The refresh interval in minutes
 
 **Note:** For exlude_replies and include_rts the number of returned tweets are filtered 
 after the count option is executed.  
@@ -44,13 +49,4 @@ https://dev.twitter.com/docs/error-codes-responses
 Plugin uses third-party php library twitteroauth   
 Developed by Abraham Williams | abraham@abrah.am | http://abrah.am | @abraham  
 https://github.com/abraham/twitteroauth to authenticate against twitter's api.
-
-
-
-
-
-## TODO ##
-1. Implement User Profile Picture logic
-2. Base Css styles
-3. Fallback php cacheing
 

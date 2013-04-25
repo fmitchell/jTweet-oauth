@@ -8,7 +8,7 @@
     <h1>Jquery Twitter plugin</h1>
 
     <div class="layout-twitter-feed">
-        <h2>Twitter feed</h2>
+        <h3>Twitter feed</h3>
         <div id="tweets"></div>
     </div>
 
@@ -19,9 +19,11 @@
     <script type="text/javascript">
         $(document).ready(function(){
 
-            $('#tweets').tweet({
+            $('#tweets').jTweet({
                 count: 10,
-                screen_name: "joshmfrankel"
+                screen_name: "joshmfrankel",
+                show_profile: true,
+                debug: true
             });
 
         });
