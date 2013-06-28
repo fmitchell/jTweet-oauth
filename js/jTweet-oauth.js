@@ -8,13 +8,14 @@
  * @copyright Copyright (c) 2013, Joshua Frankel
  * @link https://github.com/joshmfrankel/jTweet-oauth
  * @see  Twitteroauth https://github.com/abraham/twitteroauth for authentication details
- * @version 0.9
+ * @version 1.1
  */
 
 // Wrap the plugin in the jquery dollar sign
 // This will prevent overriding other methods with
 // the same name as the plugin
 // Additionally we can use $ to reference jquery
+// Closure to allow for private / public methods
 (function($){
 
     // Map the plugin name as a function in jQuery
@@ -22,23 +23,8 @@
     $.fn.jTweet = function(options) {
 
         // Set the default plugin values
-        var defaults = {
-            count: 5,
-            css_prefix_class: 'jTweet',
-            debug: false,
-            exclude_replies: false,
-            include_rts: true,
-            no_tweets_msg: 'There are no tweets available',
-            refresh: 5,
-            screen_name: 'the base username',
-            show_profile_image: true,
-            show_single_profile_image: true,
-            show_screen_name_link: true
-        };
-
-        // Use the jQuery method extend to merge
-        // the defaults and options arrays
-        options = $.extend({}, defaults, options);
+        // Merge the options into the settings var
+        var settings = $.extend({}, $.fn.jTweet.defaults, options);
 
         // Allow chaining by returning the this keyword
         return this.each(function() {
@@ -69,7 +55,7 @@
 
                 // Check cached time vs user set option from plugin
                 // If greater than then lets reset the localStorage
-                if (timeSinceCached > options.refresh) {
+                if (timeSinceCached > settings.refresh) {
 
                     localStorage.clear();
                     console.warn('LocalStorage has been cleared');
@@ -86,8 +72,8 @@
             // Grab User timeline
             $.ajax({
                 dataType: "json",
-                url: "./php/requestOAuth.php",
-                data: options
+                url: "../php/requestOAuth.php",
+                data: settings
 
             }).done(function (data) {
 
@@ -99,7 +85,7 @@
 
                     // Make sure we are in debug mode before outputting the direct
                     // api errors
-                    if (options.debug) {
+                    if (settings.debug) {
 
                         // Log the error to the console
                         console.error('Twitter Error Code (' + data.errors[0].code + '): ' + data.errors[0].message);
@@ -109,7 +95,7 @@
                     }
 
                     // Early return for errors
-                    return $this.html(options.no_tweets_msg);
+                    return $this.html(settings.no_tweets_msg);
                 }
 
 
@@ -121,40 +107,40 @@
 
                     // IE balks at trying to format a date string use this regex method
                     // from stackoverflow
-                    created_at = parseDate(value['created_at']);
+                    created_at = $.fn.jTweet.parseDate(value['created_at']);
 
                     // Calculate the time posted
-                    timePosted = getTimePosted(now, created_at);
+                    timePosted = $.fn.jTweet.getTimePosted(now, created_at);
 
                     // Get the tweets with links formatted
-                    tweetText = formatLinks(value['text'].toString());
+                    tweetText = $.fn.jTweet.formatLinks(value['text'].toString());
 
                     // Make sure show_profile_image is true and Check for empty string
-                    if (options.show_profile_image && value.user.profile_image_url !== '' && singleProfileImage === '') {
+                    if (settings.show_profile_image && value.user.profile_image_url !== '' && singleProfileImage === '') {
 
                         // Create the user profile image
-                        userImage = '<img src="' + value.user.profile_image_url + '" alt="' + value.user.screen_name + ': ' + value.user.description + '" class="' + options.css_prefix_class + '-profile-image"/>';
+                        userImage = '<img src="' + value.user.profile_image_url + '" alt="' + value.user.screen_name + ': ' + value.user.description + '" class="' + settings.css_prefix_class + '-profile-image"/>';
 
-                        if (options.show_single_profile_image) {
+                        if (settings.show_single_profile_image) {
                             singleProfileImage = userImage;
                             userImage = '';
                         }
                     }
 
                     // Output the html
-                    output += '<div class="' + options.css_prefix_class + '-single-tweet">' + userImage + '<div class="' + options.css_prefix_class + '-tweet-text">' + tweetText + '<div class="' + options.css_prefix_class + '-posted-at">' + timePosted + '</div></div></div>';
+                    output += '<div class="' + settings.css_prefix_class + '-single-tweet">' + userImage + '<div class="' + settings.css_prefix_class + '-tweet-text">' + tweetText + '<div class="' + settings.css_prefix_class + '-posted-at">' + timePosted + '</div></div></div>';
 
                 });
 
 
 
                 // Are we displaying a main twitter handle link
-                if (options.show_screen_name_link) {
-                    output = '<a href="https://www.twitter.com/' + options.screen_name + '" class="' + options.css_prefix_class + '-screen-name-link">@' + options.screen_name + '</a>' + output;
+                if (settings.show_screen_name_link) {
+                    output = '<a href="https://www.twitter.com/' + settings.screen_name + '" class="' + settings.css_prefix_class + '-screen-name-link">@' + settings.screen_name + '</a>' + output;
                 }
 
-                                // For single profile images
-                if (options.show_profile_image && singleProfileImage !== '') {
+                // For single profile images
+                if (settings.show_profile_image && singleProfileImage !== '') {
                     output = singleProfileImage + output;
                 }
 
@@ -184,7 +170,7 @@
                 console.error('There was an error with OAuth, the Twitter service is down, or php/requestOAuth.php is missing/invalid');
 
                 // If debug mode then dump the event varaible
-                if (options.debug) {
+                if (settings.debug) {
                     console.error(e);
                 }
 
@@ -196,6 +182,27 @@
 
 
     /**
+     * Public access to default plugin settings
+     *
+     * This allows the user to change settings before
+     * even calling the plugin. It also allows for unit testing
+     * opportunities.
+     */
+    $.fn.jTweet.defaults = {
+        count: 5, // The number of tweets to grab
+        css_prefix_class: 'jTweet', // The class to prefix the top level html element with for styling
+        debug: false,
+        exclude_replies: false,
+        include_rts: true,
+        no_tweets_msg: 'There are no tweets available',
+        refresh: 5,
+        screen_name: 'the base username',
+        show_profile_image: true,
+        show_single_profile_image: true,
+        show_screen_name_link: true
+    };
+
+    /**
      * Get Time Posted
      *
      * Determine the elapsed time for the posts
@@ -204,7 +211,7 @@
      * @param  {Date} endDate   The End date
      * @return {string}         The formatted string for time posted
      */
-    function getTimePosted(startDate, endDate) {
+    $.fn.jTweet.getTimePosted = function (startDate, endDate) {
 
         // Init var
         var timePosted, diff, seconds, minutes, hours;
@@ -241,7 +248,7 @@
         }
 
         return timePosted;
-    }
+    };
 
     /**
      * Format Links
@@ -253,7 +260,7 @@
      * @param  {string} text The Tweet text
      * @return {string}      The formatted text
      */
-    function formatLinks (text) {
+    $.fn.jTweet.formatLinks = function (text) {
 
         // init the output variable
         var tweet = '';
@@ -275,7 +282,7 @@
 
         // return the formatted tweet
         return tweet;
-    }
+    };
 
     /**
      * Parse Date
@@ -287,9 +294,9 @@
      * @param  {string} str The datetime string to convert
      * @return {Date}       A Properly formatted datetime
      */
-    function parseDate(str) {
+    $.fn.jTweet.parseDate = function (str) {
         var v=str.split(' ');
         return new Date(Date.parse(v[1]+" "+v[2]+", "+v[5]+" "+v[3]+" UTC"));
-    }
+    };
 
 })(jQuery);

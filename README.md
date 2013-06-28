@@ -1,5 +1,5 @@
 # jQuery Twitter Plugin with OAuth support #
-**Version:** 0.5  
+**Version:** 1.0 
 This plugin build arround the twitteroauth library to create  
 an easy to use way of grabbing tweets from Twitter's 1.1 api
 

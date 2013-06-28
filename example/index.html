@@ -16,12 +16,17 @@
     <script type="text/javascript" src="../js/jquery.min.js"></script>
     <script type="text/javascript" src="../js/modernizr-2.6.2.min.js"></script>
     <script type="text/javascript" src="../js/jTweet-oauth.js"></script>
-    <script type="text/javascript" src="../js/jTweet-oauth.js"></script>
     <script type="text/javascript">
+
+        $.fn.jTweet.defaults.count = 15;
+
+        var test = $.fn.jTweet.formatLinks('Whats up dude @joshmfrankel you #rock joshmfrankel@gmail.com go here btw http://www.google.com');
+
+        console.log(test);
+
         $(document).ready(function(){
 
             $('#tweets').jTweet({
-                count: 10,
                 screen_name: "joshmfrankel",
                 show_profile: true
             });
