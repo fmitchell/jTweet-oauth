@@ -272,13 +272,14 @@
         var hashRegex = /(\#{1}(\w+))/gi;
 
         // @ tag regex for username replace, email address are not allowed
-        var atRegex = /(\s\@{1}(\w+))/gi;
+        //var atRegex = /(\s\@{1}(\w+))/gi;
+        var atRegex = /(\s{1}|^)(\@{1}(\w+))(\s{1}|\.$|$)/gi;
 
         // The Regex replace
         tweet = text
             .replace(linkRegex, '<a href="$1">$1</a>')
             .replace(hashRegex, '<a href="https://www.twitter.com/$1">$1</a>')
-            .replace(atRegex,   '<a href="https://www.twitter.com/$1">$1</a>');
+            .replace(atRegex,   '<a href="https://www.twitter.com/$2">$2</a>');
 
         // return the formatted tweet
         return tweet;
