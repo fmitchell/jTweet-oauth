@@ -6,6 +6,8 @@ an easy to use way of grabbing tweets from Twitter's 1.1 api
 ## TODO ##
 1. Basic CSS Styles
 2. PHP APC Cache for server caching
+3. Convert requestOAuth.php into a class 
+4. Add support for multiple types of api requests
 
 ## Implementation ##
 1. Include jquery, modernizr, and the plugin javascript as scripts
