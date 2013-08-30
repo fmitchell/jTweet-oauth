@@ -1,6 +1,5 @@
 {
     "name": "joshmfrankel/jTweet-oauth",
-    "version": "1.0.1",
     "dist": {
         "url": "https://github.com/joshmfrankel/jTweet-oauth.git",
         "type": "vcs"
