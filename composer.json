@@ -2,7 +2,6 @@
     "name": "joshmfrankel/jTweet-oauth",
     "autoload": {
         "files": [
-            "js/jTweet-oauth.min.js",
             "php/config.php",
             "php/requestOAuth.php",
             "php/twitterOAuth/OAuth.php",
