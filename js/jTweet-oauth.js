@@ -72,7 +72,7 @@
             // Grab User timeline
             $.ajax({
                 dataType: "json",
-                url: "../php/requestOAuth.php",
+                url: settings.url,
                 data: settings
 
             }).done(function (data) {
@@ -167,7 +167,8 @@
             }).fail(function (e) {
 
                 // We haz fail
-                console.error('There was an error with OAuth, the Twitter service is down, or php/requestOAuth.php is missing/invalid');
+                console.error('There was an error with OAuth, the Twitter service is down, or php/requestOAuth.php is missing.
+                     Also check settings.url for the appropriate path to requestOAuth.php');
 
                 // If debug mode then dump the event varaible
                 if (settings.debug) {
@@ -199,7 +200,8 @@
         screen_name: 'the base username',
         show_profile_image: true,
         show_single_profile_image: true,
-        show_screen_name_link: true
+        show_screen_name_link: true,
+        url: '../php/requestOAuth.php'
     };
 
     /**
