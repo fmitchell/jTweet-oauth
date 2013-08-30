@@ -1,7 +1,12 @@
 {
     "name": "joshmfrankel/jTweet-oauth",
-    "dist": {
-        "url": "https://github.com/joshmfrankel/jTweet-oauth.git",
-        "type": "vcs"
+    "autoload": {
+        "files": [
+            "js/jTweet-oauth.min.js",
+            "php/config.php",
+            "php/requestOAuth.php",
+            "php/twitterOAuth/OAuth.php",
+            "php/twitterOAuth/twitteroauth.php"
+        ]
     }
 }
