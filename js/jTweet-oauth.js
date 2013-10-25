@@ -167,8 +167,7 @@
             }).fail(function (e) {
 
                 // We haz fail
-                console.error('There was an error with OAuth, the Twitter service is down, or php/requestOAuth.php is missing.
-                     Also check settings.url for the appropriate path to requestOAuth.php');
+                console.error('There was an error with OAuth, the Twitter service is down, or php/requestOAuth.php is missing. Also check settings.url for the appropriate path to requestOAuth.php');
 
                 // If debug mode then dump the event varaible
                 if (settings.debug) {
