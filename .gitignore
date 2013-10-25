@@ -1,3 +1,3 @@
-
+.DS_Store
 # Remove this file as it contains private keys
 php/config.php
